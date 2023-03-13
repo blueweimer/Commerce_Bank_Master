@@ -67,6 +67,7 @@ public class SecurityConfiguration {
 
     //This is an in memory database, which adds users below.
     //TODO: Connect to MySQL in order to add an Add User page.
+    /*
     @Bean
     public UserDetailsService user(){
         return new InMemoryUserDetailsManager(
@@ -75,6 +76,13 @@ public class SecurityConfiguration {
                         .authorities("read")
                         .build()
         );
+    }
+
+     */
+
+    @Bean
+    public UserDetailsService user(){
+        return new JdbcUserDetailsManager(dataSource);
     }
 
 
