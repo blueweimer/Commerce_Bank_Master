@@ -26,7 +26,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -63,37 +66,21 @@ public class SecurityConfiguration {
         return new ProviderManager(authProvider);
     }
 
-
-
-    //This is an in memory database, which adds users below.
-    //TODO: Connect to MySQL in order to add an Add User page.
-    /*
+    //Hard-coding addition to MySQL Database
+    //Used for testing purposes
+    //TODO: Integrate a password Encryption to replace "noopPasswordEncoder"
     @Bean
-    public UserDetailsService user(){
-        return new InMemoryUserDetailsManager(
-                User.withUsername("user")
-                        .password("{noop}password")
-                        .authorities("read")
-                        .build()
-        );
+    JdbcUserDetailsManager users(PasswordEncoder encoder){
+        UserDetails admin = User.builder()
+                .username("userThirteen")
+                .password("{noop}password")
+                .roles("USER")
+                .build();
+        System.out.println(admin.getPassword());
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+       // jdbcUserDetailsManager.createUser(admin);
+        return jdbcUserDetailsManager;
     }
-
-     */
-
-    @Bean
-    public UserDetailsService user(){
-        return new JdbcUserDetailsManager(dataSource);
-    }
-
-
-
-
-
-
-
-
-
-
 
     //Configures server to authenticate user
     @Bean
@@ -103,6 +90,29 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable()) //disable cross-site request forgery
                 .authorizeHttpRequests( auth -> auth
                         .mvcMatchers("/token").permitAll()//Authenticate using "controller/AuthController"
+                        .mvcMatchers("/getId").permitAll()
+                        .mvcMatchers("/getId/**").permitAll()
+                        .mvcMatchers("/getUIdById/**").permitAll()
+                        .mvcMatchers("/getBalanceById/**").permitAll()
+                        .mvcMatchers("/getAmountById/**").permitAll()
+                        .mvcMatchers("/getTypeById/**").permitAll()
+                        .mvcMatchers("/getSavingsGoalById/**").permitAll()
+                        .mvcMatchers("/getDateById/**").permitAll()
+                        .mvcMatchers("/getTIdByUId/**").permitAll()
+                        .mvcMatchers("/getBalanceByUId/**").permitAll()
+                        .mvcMatchers("/getAmountByUId/**").permitAll()
+                        .mvcMatchers("/getTypeByUId/**").permitAll()
+                        .mvcMatchers("/getSavingsGoalByUId/**").permitAll()
+                        .mvcMatchers("/getDateByUId/**").permitAll()
+                        .mvcMatchers("/setSavingsGoal/**").permitAll()
+                        .mvcMatchers("/updateType/**").permitAll()
+                        .mvcMatchers("/updateBalance/**").permitAll()
+                        .mvcMatchers("/newExpensesIncomes/**").permitAll()
+                        .mvcMatchers("/getTargetBalance/**").permitAll()
+                        .mvcMatchers("/displayExpensesIncomes/**").permitAll()
+                        .mvcMatchers("/findDailyBalance/**").permitAll()
+                        .mvcMatchers("/findOverUnder/**").permitAll()
+                        .mvcMatchers("/checkGetWorks").permitAll()
                         .anyRequest().authenticated() //authorize all requests from spring
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//disable session
@@ -140,6 +150,19 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
+    //BCryptPasswordEncoder
+    //Doesn't function yet
+    @Bean
+    PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+
+
+
 
 
 

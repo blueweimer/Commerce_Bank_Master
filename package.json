@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "node-lombok": "^1.1.1"
+  }
+}
